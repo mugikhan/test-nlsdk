@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "NLScannerSDK"
 include(":app")
- 
+include(":nlsdk")
+include(":serial-port")
