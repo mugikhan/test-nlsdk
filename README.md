@@ -2,8 +2,6 @@
 
 A library for integrating NLScan barcode scanners with Android and Flutter applications.
 
-[![](https://jitpack.io/v/mugikhan/test-nlsdk.svg)](https://jitpack.io/#mugikhan/test-nlsdk)
-
 ## Features
 
 - Easy USB connection management for NLScan devices
@@ -13,49 +11,101 @@ A library for integrating NLScan barcode scanners with Android and Flutter appli
 
 ## Installation
 
-### Android
+### Authentication Setup
 
-1. Add JitPack repository to your root `build.gradle` or `settings.gradle` file:
+Since this package is hosted on GitHub Packages, you'll need to authenticate to access it. Follow these steps:
 
-```groovy
-// For build.gradle
-allprojects {
-    repositories {
-        ...
-        maven { url 'https://jitpack.io' }
-    }
-}
+1. Generate a GitHub Personal Access Token (PAT):
+   - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Generate a new token with at least the `read:packages` scope
+   - Copy the token for use in the next step
 
-// OR for settings.gradle.kts
+2. Configure your project to authenticate with GitHub Packages:
+
+#### For Gradle (Kotlin DSL):
+
+Add this to your `settings.gradle.kts`:
+
+```kotlin
 dependencyResolutionManagement {
     repositories {
-        ...
-        maven { url = uri("https://jitpack.io") }
+        google()
+        mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/mugikhan/NLScannerSDK")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 ```
 
-2. Add the dependency to your app's `build.gradle` file:
+Create or update your `gradle.properties` file (do not commit this file to version control):
+
+```properties
+gpr.user=YOUR_GITHUB_USERNAME
+gpr.key=YOUR_GITHUB_PERSONAL_ACCESS_TOKEN
+```
+
+#### For Gradle (Groovy):
+
+Add this to your `settings.gradle`:
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/mugikhan/NLScannerSDK"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+```
+
+### Adding the Dependency
+
+After setting up authentication, add the dependency to your app's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("com.github.mugikhan:nlsdk:1.0.0")
+}
+```
+
+Or in Groovy:
 
 ```groovy
 dependencies {
-    implementation 'com.github.mugikhan.test-nlsdk:nlsdk:1.0.0'
+    implementation 'com.github.mugikhan:nlsdk:1.0.0'
 }
 ```
 
-### Flutter
+### For Flutter Projects
 
 1. Add the dependency to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Add this for your nlsdk
   nlscannersdk:
     git:
-      url: https://github.com/mugikhan/test-nlsdk.git
-      ref: main # or specify a tag/commit
+      url: https://github.com/mugikhan/NLScannerSDK.git
+      ref: v1.0.0  # Use the tag you created
 ```
 
-2. For Flutter, you'll need to create platform channels to communicate with the native SDK. See the usage example below.
+2. For Flutter, you'll need to create platform channels to communicate with the native SDK.
 
 ## Usage
 
@@ -67,14 +117,14 @@ import com.nlscan.nlsdk.NLDeviceStream
 
 class YourActivity : AppCompatActivity() {
     private lateinit var scannerManager: ScannerManager
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        
         // Initialize scanner manager
         scannerManager = ScannerManager(this)
-
+        
         // Set up listeners
         lifecycleScope.launch {
             scannerManager.connectionState.collect { isConnected ->
@@ -82,7 +132,7 @@ class YourActivity : AppCompatActivity() {
                 updateConnectionUI(isConnected)
             }
         }
-
+        
         lifecycleScope.launch {
             scannerManager.scanResult.collect { result ->
                 result?.let {
@@ -91,11 +141,11 @@ class YourActivity : AppCompatActivity() {
                 }
             }
         }
-
+        
         // Connect to scanner
         scannerManager.connectToScanner()
     }
-
+    
     override fun onDestroy() {
         super.onDestroy()
         scannerManager.disconnectScanner()
@@ -212,7 +262,3 @@ For Android, add the following permissions to your `AndroidManifest.xml`:
 ## License
 
 This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.

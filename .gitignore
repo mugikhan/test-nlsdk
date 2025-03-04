@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# GitHub Packages credentials
+gradle.properties
+!gradle.properties.template

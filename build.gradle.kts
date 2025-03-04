@@ -6,7 +6,18 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0" apply false
 }
 
+// Set group and version for all projects
 allprojects {
-    group = "com.github.mugikhan"
+    group = "com.github.mugikhan"  
     version = "1.0.0"
+    
+    // Add repositories to all projects
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/mugikhan/test-nlsdk")  
+        }
+    }
 }
