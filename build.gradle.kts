@@ -10,14 +10,4 @@ plugins {
 allprojects {
     group = "com.github.mugikhan"  
     version = "1.0.0"
-    
-    // Add repositories to all projects
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/mugikhan/test-nlsdk")  
-        }
-    }
 }
